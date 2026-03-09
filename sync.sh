@@ -64,7 +64,7 @@ read_yaml() {
 read_yaml_value() {
   # Read a single YAML value
   local file="$1" key="$2"
-  grep "^${key}:" "$file" | head -1 | sed "s/^${key}:[[:space:]]*//" | sed 's/#.*//' | xargs
+  grep "^${key}:" "$file" 2>/dev/null | head -1 | sed "s/^${key}:[[:space:]]*//" | sed 's/#.*//' | xargs || true
 }
 
 # ── 1. Pull latest repo ──────────────────────────────────────────────
