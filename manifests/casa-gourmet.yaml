@@ -1,0 +1,31 @@
+# Tenant Manifest: Casa Gourmet (first client)
+# Push changes to this file → sync.sh reconciles automatically on the VM.
+
+tenant_id: casa-gourmet
+instance_type: client
+
+openclaw_version: latest
+
+workspace_template: casa-gourmet
+
+config_override: tenants/casa-gourmet.jsonc
+
+skills:
+  - memory-extractor
+  - memory-consolidator
+  - memory-hygiene
+  - memory-forget
+  - memory-reflect
+  # Client-specific:
+  # - whatsapp-sales
+
+packages:
+  - jq
+  - curl
+  - git
+
+tools: []
+
+pip: []
+
+npm_global: []

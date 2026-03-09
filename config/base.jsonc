@@ -1,0 +1,71 @@
+// PesuClaw Base Configuration — Security & Platform Defaults
+//
+// This file is $include'd by the tenant's openclaw.json.
+// It enforces platform-wide security settings that sync.sh keeps up to date.
+//
+// DO NOT put channels, models, or agents here — those are managed at runtime
+// via `openclaw config set` and live in the tenant's openclaw.json.
+//
+// Hierarchy:
+//   openclaw.json (runtime, managed by OpenClaw)
+//     └── $include: /opt/pesuclaw/config/base.jsonc   ← this file
+//         └── overridden by tenant-specific values in openclaw.json
+{
+  // Tools: restricted profile by default
+  tools: {
+    profile: "messaging",
+    allow: ["group:web", "group:memory", "group:sessions"],
+    deny: ["gateway", "cron", "group:nodes"],
+    exec: {
+      security: "allowlist",
+    },
+    elevated: [],
+    loopDetection: {
+      enabled: true,
+      warningThreshold: 8,
+      criticalThreshold: 15,
+      globalCircuitBreakerThreshold: 25,
+    },
+  },
+
+  // Commands: locked down for clients
+  commands: {
+    config: false,
+    restart: false,
+    bash: false,
+  },
+
+  // Channels: config writes disabled
+  channels: {
+    defaults: {
+      configWrites: false,
+    },
+  },
+
+  // Skills: live reload enabled
+  skills: {
+    load: {
+      watch: true,
+    },
+  },
+
+  // Cron: enabled with hot reload
+  cron: {
+    enabled: true,
+    hotReload: true,
+    timezone: "America/Argentina/Buenos_Aires",
+  },
+
+  // Logging: redact sensitive data
+  logging: {
+    level: "info",
+    redactSensitive: "tools",
+  },
+
+  // Secrets: read from environment (populated from GCP Secret Manager)
+  secrets: {
+    providers: {
+      default: { source: "env" },
+    },
+  },
+}

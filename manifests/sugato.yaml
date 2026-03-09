@@ -1,0 +1,41 @@
+# Tenant Manifest: Sugato (internal)
+# Push changes to this file → sync.sh reconciles automatically on the VM.
+#
+# Only declare WHAT should be present. The sync script handles HOW.
+# For runtime config changes (channels, models, cron), use `openclaw config` directly.
+
+tenant_id: sugato
+instance_type: internal
+
+# OpenClaw version (pinned or "latest")
+openclaw_version: latest
+
+# Workspace template to bootstrap from
+workspace_template: sugato
+
+# Config profile: base.jsonc + this tenant override
+config_override: tenants/sugato.jsonc
+
+# Skills to install (from skills/ directory in this repo)
+skills:
+  - memory-extractor
+  - memory-consolidator
+  - memory-hygiene
+  - memory-forget
+  - memory-reflect
+
+# System packages (apt) — only installed if missing
+packages:
+  - jq
+  - curl
+  - git
+
+# Custom tools — scripts or binaries copied to /opt/pesuclaw/bin/
+# and added to PATH for the openclaw user
+tools: []
+
+# Python packages (pip) — only if needed by custom tools/skills
+pip: []
+
+# Node packages (global) — only if needed by custom tools
+npm_global: []

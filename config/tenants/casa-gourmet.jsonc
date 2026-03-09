@@ -1,0 +1,20 @@
+// Casa Gourmet — tenant-specific overrides
+//
+// $include'd by Casa Gourmet's openclaw.json on top of base.jsonc.
+// Inherits locked-down security defaults from base.
+// Only add overrides here that differ from base.
+{
+  // Sandbox: all tool executions in Docker containers
+  agents: {
+    defaults: {
+      sandbox: {
+        mode: "all",
+        scope: "session",
+        workspaceAccess: "ro",
+        docker: {
+          network: "bridge",
+        },
+      },
+    },
+  },
+}

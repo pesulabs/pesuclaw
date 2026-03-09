@@ -1,0 +1,24 @@
+# PesuClaw .gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Secrets — never commit
+*.key
+*.pem
+.env
+.env.*
+/etc/openclaw/
+
+# Temp
+*.tmp
+*.log
+/tmp/
+
+# Terraform cache (if any)
+.terragrunt-cache/
+.terraform/
