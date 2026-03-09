@@ -1,0 +1,15 @@
+# Deployment Profile for the Central Orchestrator
+tenant: orchestrator
+type: internal
+
+# Base system configuration
+config:
+  agent_id: os-orchestrator-01
+  memory_backend: qmd
+  plugins:
+    contextEngine: legacy
+
+# Skills equipped to this specific tenant
+skills:
+  - name: tenant-manager
+  - name: manifest-editor
