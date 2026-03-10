@@ -238,7 +238,7 @@ fi
 #   ~/.openclaw/openclaw.json                 ← runtime config (managed by OpenClaw)
 #       $include: [base, tenant override]
 
-INCLUDE_DIR="/opt/pesuclaw/config"
+INCLUDE_DIR="$OPENCLAW_HOME/config"
 mkdir -p "$INCLUDE_DIR/tenants"
 
 # Deploy base config (always update from repo)
@@ -259,8 +259,7 @@ fi
 # Deploy tenant override config (always update from repo)
 if [[ -n "$CONFIG_OVERRIDE" && -f "$SCRIPT_DIR/config/$CONFIG_OVERRIDE" ]]; then
   TENANT_SRC="$SCRIPT_DIR/config/$CONFIG_OVERRIDE"
-  TENANT_DST="$INCLUDE_DIR/$CONFIG_OVERRIDE"
-  mkdir -p "$(dirname "$TENANT_DST")"
+  TENANT_DST="$INCLUDE_DIR/$(basename "$CONFIG_OVERRIDE")"
   if [[ ! -f "$TENANT_DST" ]] || ! cmp -s "$TENANT_SRC" "$TENANT_DST"; then
     log "  Updating tenant config layer: $CONFIG_OVERRIDE"
     if [[ "$DRY_RUN" == "false" ]]; then
@@ -287,12 +286,9 @@ if [[ ! -f "$OC_CONFIG" ]]; then
   if [[ "$DRY_RUN" == "false" ]]; then
     cat > "$OC_CONFIG" <<SEED
 {
-  // PesuClaw: base security + tenant overrides loaded via \$include.
-  // This file is managed by OpenClaw at runtime — add channels, models, agents here.
-  // Security defaults are enforced from /opt/pesuclaw/config/ (synced from git).
   "\$include": [
-    "/opt/pesuclaw/config/base.jsonc",
-    "/opt/pesuclaw/config/$CONFIG_OVERRIDE"
+    "./config/base.jsonc",
+    "./config/$(basename "$CONFIG_OVERRIDE")"
   ],
 
   "gateway": {
