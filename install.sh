@@ -97,7 +97,7 @@ Wants=network-online.target
 Type=simple
 User=${OPENCLAW_USER}
 WorkingDirectory=${OPENCLAW_HOME}/workspace
-Environment=OPENCLAW_HOME=${OPENCLAW_HOME}
+Environment=OPENCLAW_HOME=/home/openclaw
 Environment=TENANT_ID=${TENANT_ID}
 Environment=PATH=/opt/pesuclaw/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile=-/etc/openclaw/env
