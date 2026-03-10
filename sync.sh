@@ -276,45 +276,53 @@ fi
 OC_CONFIG="$OPENCLAW_HOME/openclaw.json"
 if [[ ! -f "$OC_CONFIG" ]]; then
   log "  Seeding initial openclaw.json with \$include references"
+  
+  # Generate a local gateway token if not present
+  if ! grep -q "^OPENCLAW_GATEWAY_TOKEN=" /etc/openclaw/env; then
+    NEW_TOKEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32 || true)
+    echo "OPENCLAW_GATEWAY_TOKEN=$NEW_TOKEN" >> /etc/openclaw/env
+    log "  Generated local OPENCLAW_GATEWAY_TOKEN."
+  fi
+
   if [[ "$DRY_RUN" == "false" ]]; then
     cat > "$OC_CONFIG" <<SEED
 {
   // PesuClaw: base security + tenant overrides loaded via \$include.
   // This file is managed by OpenClaw at runtime — add channels, models, agents here.
   // Security defaults are enforced from /opt/pesuclaw/config/ (synced from git).
-  \$include: [
+  "\$include": [
     "/opt/pesuclaw/config/base.jsonc",
     "/opt/pesuclaw/config/$CONFIG_OVERRIDE"
   ],
 
-  gateway: {
-    mode: "local",
-    port: 18789,
-    bind: "loopback",
-    auth: {
-      mode: "token",
-      token: "\${OPENCLAW_GATEWAY_TOKEN}"
+  "gateway": {
+    "mode": "local",
+    "port": 18789,
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "\${OPENCLAW_GATEWAY_TOKEN}"
     }
   },
 
-  agents: {
-    defaults: {
-      model: { primary: "google/gemini-2.5-flash" },
-      userTimezone: "America/Argentina/Buenos_Aires",
-      maxConcurrent: 2,
-      heartbeat: {
-        every: "30m",
-        target: "last",
-        lightContext: true,
-        activeHours: {
-          start: "09:00",
-          end: "22:00",
-          timezone: "America/Argentina/Buenos_Aires"
+  "agents": {
+    "defaults": {
+      "model": { "primary": "google/gemini-2.5-flash" },
+      "userTimezone": "America/Argentina/Buenos_Aires",
+      "maxConcurrent": 2,
+      "heartbeat": {
+        "every": "30m",
+        "target": "last",
+        "lightContext": true,
+        "activeHours": {
+          "start": "09:00",
+          "end": "22:00",
+          "timezone": "America/Argentina/Buenos_Aires"
         }
       }
     },
-    list: [
-      { id: "main", default: true }
+    "list": [
+      { "id": "main", "default": true }
     ]
   }
 }
