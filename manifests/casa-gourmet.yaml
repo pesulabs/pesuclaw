@@ -4,7 +4,7 @@
 tenant_id: casa-gourmet
 instance_type: client
 
-openclaw_version: latest
+openclaw_version: '2026.3.8'
 
 workspace_template: casa-gourmet
 
@@ -16,6 +16,9 @@ skills:
   - memory-hygiene
   - memory-forget
   - memory-reflect
+  - here-now
+  - agentmail
+  - youtube-transcript
   # Client-specific:
   # - whatsapp-sales
 
