@@ -20,7 +20,7 @@ skills:
   - agentmail
   - youtube-transcript
   # Client-specific:
-  - whatsapp-sales
+  # - whatsapp-sales
 
 packages:
   - jq
