@@ -14,7 +14,7 @@
     "exec": {
       "security": "allowlist"
     },
-    "elevated": [],
+    "elevated": {},
     "loopDetection": {
       "enabled": true,
       "warningThreshold": 8,
@@ -28,9 +28,7 @@
     "bash": false
   },
   "channels": {
-    "defaults": {
-      "configWrites": false
-    }
+    "defaults": {}
   },
   "skills": {
     "load": {
@@ -38,9 +36,7 @@
     }
   },
   "cron": {
-    "enabled": true,
-    "hotReload": true,
-    "timezone": "America/Argentina/Buenos_Aires"
+    "enabled": true
   },
   "logging": {
     "level": "info",
