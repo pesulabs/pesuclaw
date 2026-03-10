@@ -4,21 +4,21 @@
 // Because this is our own agent: full access, sandbox off.
 {
   // Full tool access for internal ops
-  tools: {
-    profile: "full",
-    deny: [],
+  "tools": {
+    "profile": "full",
+    "deny": []
   },
 
   // Allow config changes from chat (internal testing)
-  commands: {
-    config: true,
-    bash: true,
+  "commands": {
+    "config": true,
+    "bash": true
   },
 
   // Allow config writes from channels
-  channels: {
-    defaults: {
-      configWrites: true,
-    },
-  },
+  "channels": {
+    "defaults": {
+      "configWrites": true
+    }
+  }
 }

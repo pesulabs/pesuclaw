@@ -12,60 +12,60 @@
 //         └── overridden by tenant-specific values in openclaw.json
 {
   // Tools: restricted profile by default
-  tools: {
-    profile: "messaging",
-    allow: ["group:web", "group:memory", "group:sessions"],
-    deny: ["gateway", "cron", "group:nodes"],
-    exec: {
-      security: "allowlist",
+  "tools": {
+    "profile": "messaging",
+    "allow": ["group:web", "group:memory", "group:sessions"],
+    "deny": ["gateway", "cron", "group:nodes"],
+    "exec": {
+      "security": "allowlist"
     },
-    elevated: [],
-    loopDetection: {
-      enabled: true,
-      warningThreshold: 8,
-      criticalThreshold: 15,
-      globalCircuitBreakerThreshold: 25,
-    },
+    "elevated": [],
+    "loopDetection": {
+      "enabled": true,
+      "warningThreshold": 8,
+      "criticalThreshold": 15,
+      "globalCircuitBreakerThreshold": 25
+    }
   },
 
   // Commands: locked down for clients
-  commands: {
-    config: false,
-    restart: false,
-    bash: false,
+  "commands": {
+    "config": false,
+    "restart": false,
+    "bash": false
   },
 
   // Channels: config writes disabled
-  channels: {
-    defaults: {
-      configWrites: false,
-    },
+  "channels": {
+    "defaults": {
+      "configWrites": false
+    }
   },
 
   // Skills: live reload enabled
-  skills: {
-    load: {
-      watch: true,
-    },
+  "skills": {
+    "load": {
+      "watch": true
+    }
   },
 
   // Cron: enabled with hot reload
-  cron: {
-    enabled: true,
-    hotReload: true,
-    timezone: "America/Argentina/Buenos_Aires",
+  "cron": {
+    "enabled": true,
+    "hotReload": true,
+    "timezone": "America/Argentina/Buenos_Aires"
   },
 
   // Logging: redact sensitive data
-  logging: {
-    level: "info",
-    redactSensitive: "tools",
+  "logging": {
+    "level": "info",
+    "redactSensitive": "tools"
   },
 
   // Secrets: read from environment (populated from GCP Secret Manager)
-  secrets: {
-    providers: {
-      default: { source: "env" },
-    },
-  },
+  "secrets": {
+    "providers": {
+      "default": { "source": "env" }
+    }
+  }
 }

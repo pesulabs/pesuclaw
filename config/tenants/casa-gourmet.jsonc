@@ -5,16 +5,16 @@
 // Only add overrides here that differ from base.
 {
   // Sandbox: all tool executions in Docker containers
-  agents: {
-    defaults: {
-      sandbox: {
-        mode: "all",
-        scope: "session",
-        workspaceAccess: "ro",
-        docker: {
-          network: "bridge",
-        },
-      },
-    },
-  },
+  "agents": {
+    "defaults": {
+      "sandbox": {
+        "mode": "all",
+        "scope": "session",
+        "workspaceAccess": "ro",
+        "docker": {
+          "network": "bridge"
+        }
+      }
+    }
+  }
 }
