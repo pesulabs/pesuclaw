@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Testing CI pipeline run
 # PesuClaw Sync — GitOps reconciler
 #
 # Reads the tenant manifest and reconciles the VM to match desired state.
