@@ -22,7 +22,7 @@ jobs:
         with:
           scandir: './'
           # Ignore the skills directory since those might contain third-party scripts we don't strictly control
-          ignore_paths: 'skills/'
+          ignore_paths: 'skills'
         env:
           # SC2155: Declare and assign separately to avoid masking return values.
           # We disable SC2155 as it's heavily used in conventional bash scripts.
