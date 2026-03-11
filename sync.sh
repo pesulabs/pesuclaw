@@ -48,7 +48,11 @@ fi
 
 # ── Helpers ───────────────────────────────────────────────────────────
 log() { echo "[sync] $*"; }
-vlog() { [[ "$VERBOSE" == "true" ]] && echo "[sync] $*" || true; }
+vlog() {
+  if [[ "$VERBOSE" == "true" ]]; then
+    echo "[sync] $*"
+  fi
+}
 changed=0
 
 read_yaml() {
@@ -126,6 +130,7 @@ if [[ -n "$DESIRED_PACKAGES" ]]; then
     log "  Installing packages:$MISSING_PACKAGES"
     if [[ "$DRY_RUN" == "false" ]]; then
       apt-get update -qq
+      # shellcheck disable=SC2086
       apt-get install -y -qq $MISSING_PACKAGES
     fi
   fi
