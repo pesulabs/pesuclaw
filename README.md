@@ -34,3 +34,7 @@ cd /opt/pesuclaw
 ## Architecture
 
 See `architecture/openclaw-application-layer-v1.md` in the Sugato.org repo for the full design rationale.
+
+## Troubleshooting
+
+If you encounter issues during deployment or when the OpenClaw service fails to start, please refer to the [Troubleshooting Guide](TROUBLESHOOTING.md) for solutions to common configuration and GitOps sync issues.
