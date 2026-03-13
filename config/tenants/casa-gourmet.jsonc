@@ -10,5 +10,16 @@
         }
       }
     }
+  },
+  "telegram": {
+    "enabled": true,
+    "dmPolicy": "allowlist",
+    "botToken": "8703144796:AAHWOPoiMkaBAlcn57fUr9LMsS4tT5VFY2I",
+    "allowFrom": [
+      6041283426
+    ],
+    "groupPolicy": "deny",
+    "groupAllowFrom": [],
+    "streaming": "partial"
   }
 }
