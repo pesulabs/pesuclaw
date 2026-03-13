@@ -1,15 +1,31 @@
-# Deployment Profile for the Central Orchestrator
-tenant: orchestrator
-type: internal
+# Tenant Manifest: Orchestrator (internal)
+# Push changes to this file → sync.sh reconciles automatically on the VM.
 
-# Base system configuration
-config:
-  agent_id: os-orchestrator-01
-  memory_backend: qmd
-  plugins:
-    contextEngine: legacy
+tenant_id: orchestrator
+instance_type: internal
 
-# Skills equipped to this specific tenant
+# Keep orchestrator current
+openclaw_version: latest
+
+workspace_template: sugato
+
+# Config profile: base.jsonc + this tenant override
+config_override: tenants/orchestrator.jsonc
+
 skills:
-  - name: tenant-manager
-  - name: manifest-editor
+  - memory-extractor
+  - memory-consolidator
+  - memory-hygiene
+  - memory-forget
+  - memory-reflect
+
+packages:
+  - jq
+  - curl
+  - git
+
+tools: []
+
+pip: []
+
+npm_global: []

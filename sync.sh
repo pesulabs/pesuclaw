@@ -277,30 +277,30 @@ if [[ -n "$CONFIG_OVERRIDE" && -f "$SCRIPT_DIR/config/$CONFIG_OVERRIDE" ]]; then
   fi
 fi
 
-# Seed openclaw.json ONLY on first boot (never overwrite runtime config)
+# Seed/repair openclaw.json
 OC_CONFIG="$OPENCLAW_HOME/openclaw.json"
-if [[ ! -f "$OC_CONFIG" ]]; then
-  log "  Seeding initial openclaw.json with \$include references"
-  
-  # Generate a local gateway token if not present
-  if ! grep -q "^OPENCLAW_GATEWAY_TOKEN=" /etc/openclaw/env; then
-    NEW_TOKEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32 || true)
-    echo "OPENCLAW_GATEWAY_TOKEN=$NEW_TOKEN" >> /etc/openclaw/env
-    log "  Generated local OPENCLAW_GATEWAY_TOKEN."
+TENANT_CONFIG_BASENAME=""
+if [[ -n "$CONFIG_OVERRIDE" ]]; then
+  TENANT_CONFIG_BASENAME="$(basename "$CONFIG_OVERRIDE")"
+fi
+
+write_openclaw_config() {
+  local out_file="$1"
+  local include_lines="    \"./config/base.jsonc\""
+  if [[ -n "$TENANT_CONFIG_BASENAME" ]]; then
+    include_lines+=$'\n    ,"./config/'"$TENANT_CONFIG_BASENAME"'"'
   fi
 
-  if [[ "$DRY_RUN" == "false" ]]; then
-    cat > "$OC_CONFIG" <<SEED
+  cat > "$out_file" <<SEED
 {
   "\$include": [
-    "./config/base.jsonc",
-    "./config/$(basename "$CONFIG_OVERRIDE")"
+$include_lines
   ],
 
   "gateway": {
     "mode": "local",
-    "port": 18789,
-    "bind": "loopback",
+    "port": 8080,
+    "bind": "0.0.0.0",
     "auth": {
       "mode": "token",
       "token": "\${OPENCLAW_GATEWAY_TOKEN}"
@@ -329,6 +329,41 @@ if [[ ! -f "$OC_CONFIG" ]]; then
   }
 }
 SEED
+}
+
+# Generate a local gateway token if not present
+if ! grep -q "^OPENCLAW_GATEWAY_TOKEN=" /etc/openclaw/env; then
+  NEW_TOKEN=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32 || true)
+  echo "OPENCLAW_GATEWAY_TOKEN=$NEW_TOKEN" >> /etc/openclaw/env
+  log "  Generated local OPENCLAW_GATEWAY_TOKEN."
+fi
+
+if [[ ! -f "$OC_CONFIG" ]]; then
+  log "  Seeding initial openclaw.json with \$include references"
+  if [[ "$DRY_RUN" == "false" ]]; then
+    write_openclaw_config "$OC_CONFIG"
+    changed=1
+  fi
+else
+  # Auto-repair known bad config signatures from older templates
+  NEED_REPAIR=false
+  if grep -q 'configWrites' "$OC_CONFIG" 2>/dev/null; then
+    NEED_REPAIR=true
+    log "  Detected deprecated key in openclaw.json (configWrites)"
+  fi
+  if grep -q '"\$include"[[:space:]]*:[[:space:]]*"\./config/"' "$OC_CONFIG" 2>/dev/null || \
+     grep -q '"\./config/"' "$OC_CONFIG" 2>/dev/null; then
+    NEED_REPAIR=true
+    log "  Detected invalid include target in openclaw.json (./config/)"
+  fi
+
+  if [[ "$NEED_REPAIR" == "true" && "$DRY_RUN" == "false" ]]; then
+    backup="$OC_CONFIG.bak.$(date +%Y%m%d%H%M%S)"
+    cp "$OC_CONFIG" "$backup"
+    log "  Backed up invalid config to $(basename "$backup")"
+    write_openclaw_config "$OC_CONFIG"
+    changed=1
+    log "  Rewrote openclaw.json to known-good template"
   fi
 fi
 

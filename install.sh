@@ -101,7 +101,7 @@ Environment=OPENCLAW_HOME=/home/openclaw
 Environment=TENANT_ID=${TENANT_ID}
 Environment=PATH=/opt/pesuclaw/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile=-/etc/openclaw/env
-ExecStart=$(which node 2>/dev/null || echo "/usr/bin/node") $(which openclaw 2>/dev/null || echo "/usr/bin/openclaw") gateway
+ExecStart=$(which openclaw 2>/dev/null || echo "/usr/local/bin/openclaw") gateway
 Restart=always
 RestartSec=10
 StandardOutput=journal
