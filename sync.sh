@@ -351,8 +351,8 @@ else
     NEED_REPAIR=true
     log "  Detected deprecated key in openclaw.json (configWrites)"
   fi
-  if grep -q '"\$include"[[:space:]]*:[[:space:]]*"\./config/"' "$OC_CONFIG" 2>/dev/null || \
-     grep -q '"\./config/"' "$OC_CONFIG" 2>/dev/null; then
+  if grep -Eq "\"\\$include\"[[:space:]]*:[[:space:]]*\"\./config/\"" "$OC_CONFIG" 2>/dev/null || \
+     grep -Eq "\"\./config/\"" "$OC_CONFIG" 2>/dev/null; then
     NEED_REPAIR=true
     log "  Detected invalid include target in openclaw.json (./config/)"
   fi
