@@ -15,10 +15,7 @@
     "bash": true
   },
 
-  // Allow config writes from channels
   "channels": {
-    "defaults": {
-      "configWrites": true
-    }
+    "defaults": {}
   }
 }

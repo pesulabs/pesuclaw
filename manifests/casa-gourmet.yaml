@@ -1,3 +1,4 @@
+# Testing CI pipeline run
 # Tenant Manifest: Casa Gourmet (first client)
 # Push changes to this file → sync.sh reconciles automatically on the VM.
 

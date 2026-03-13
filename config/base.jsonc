@@ -1,4 +1,5 @@
 {
+  // Testing CI pipeline run
   "tools": {
     "profile": "messaging",
     "allow": [

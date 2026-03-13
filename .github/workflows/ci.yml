@@ -1,0 +1,74 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - staging
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint-bash:
+    name: Lint Bash Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './'
+          # Ignore the skills directory since those might contain third-party scripts we don't strictly control
+          ignore_paths: 'skills'
+        env:
+          # SC2155: Declare and assign separately to avoid masking return values.
+          # We disable SC2155 as it's heavily used in conventional bash scripts.
+          SHELLCHECK_OPTS: "-e SC2155"
+          
+  validate-json:
+    name: Validate JSON & JSONC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install JSON5 (for JSONC support)
+        run: npm install -g json5
+
+      - name: Check Config Directory JSONC Formats
+        run: |
+          echo "Validating JSON/JSONC syntax..."
+          # Find all .json and .jsonc files in the config directory
+          find ./config -type f \( -name "*.json" -o -name "*.jsonc" \) -print0 | while IFS= read -r -d '' file; do
+            echo "Checking $file..."
+            # Using json5 to validate the file since it supports comments (.jsonc)
+            json5 -c "$file" || { echo "❌ Syntax error in $file"; exit 1; }
+          done
+          echo "✅ All JSON variables parse cleanly."
+
+  validate-manifests:
+    name: Validate YAML Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: sudo apt-get install -y yamllint
+
+      - name: Lint Tenant Manifests
+        run: |
+          echo "Validating YAML manifests..."
+          # Creates a loose yamllint config focused purely on syntax validity rather than strict line lengths
+          cat << 'EOF' > .yamllint.yaml
+          extends: default
+          rules:
+            line-length: disable
+            document-start: disable
+            comments: disable
+          EOF
+          yamllint -c .yamllint.yaml manifests/
+          echo "✅ All YAML manifests are valid."

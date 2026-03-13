@@ -1,0 +1,10 @@
+{
+  "tools": {
+    "profile": "full",
+    "deny": []
+  },
+  "commands": {
+    "config": true,
+    "bash": true
+  }
+}
