@@ -371,6 +371,13 @@ $include_lines
     "list": [
       { "id": "main", "default": true }
     ]
+  },
+
+  "plugins": {
+    "enabled": true,
+    "slots": {
+      "memory": "openclaw-mem0"
+    }
   }
 }
 SEED
