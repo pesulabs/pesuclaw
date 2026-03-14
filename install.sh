@@ -50,7 +50,17 @@ echo ">>> Installing base dependencies..."
 apt-get update -qq
 apt-get install -y -qq curl git jq
 
-# ── 2. Node.js 22 LTS ───────────────────────────────────────────────
+# ── 2. Cloud SQL Auth Proxy ─────────────────────────────────────────
+if ! command -v cloud-sql-proxy &>/dev/null; then
+  echo ">>> Installing Cloud SQL Auth Proxy..."
+  curl -sSfL -o /usr/local/bin/cloud-sql-proxy \
+    https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.3/cloud-sql-proxy.linux.amd64
+  chmod +x /usr/local/bin/cloud-sql-proxy
+else
+  echo ">>> Cloud SQL Auth Proxy already installed"
+fi
+
+# ── 3. Node.js 22 LTS ───────────────────────────────────────────────
 if ! command -v node &>/dev/null || [[ "$(node -v | cut -d. -f1 | tr -d v)" -lt 22 ]]; then
   echo ">>> Installing Node.js 22..."
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
@@ -59,31 +69,32 @@ else
   echo ">>> Node.js $(node -v) already installed"
 fi
 
-# ── 3. Create openclaw user ──────────────────────────────────────────
+# ── 4. Create openclaw user ──────────────────────────────────────────
 if ! id "$OPENCLAW_USER" &>/dev/null; then
   echo ">>> Creating user: $OPENCLAW_USER"
   useradd --system --create-home --shell /bin/bash "$OPENCLAW_USER"
 fi
 
-# ── 4. Create directories ───────────────────────────────────────────
+# ── 5. Create directories ───────────────────────────────────────────
 echo ">>> Creating directories..."
 mkdir -p "$OPENCLAW_HOME"/{workspace,skills,agents}
 mkdir -p /opt/pesuclaw/bin
 mkdir -p /etc/openclaw
 chown -R "$OPENCLAW_USER:$OPENCLAW_USER" "$OPENCLAW_HOME"
 
-# ── 5. Store tenant ID ──────────────────────────────────────────────
+# ── 6. Store tenant ID ──────────────────────────────────────────────
 echo "$TENANT_ID" > /etc/openclaw/tenant-id
 
-# ── 6. Create secrets env file ──────────────────────────────────────
+# ── 7. Create secrets env file ──────────────────────────────────────
 if [[ ! -f /etc/openclaw/env ]]; then
   echo "# Secrets — populate from GCP Secret Manager" > /etc/openclaw/env
   echo "# GEMINI_API_KEY=" >> /etc/openclaw/env
+  echo "# OPENAI_API_KEY=" >> /etc/openclaw/env
   echo "# TELEGRAM_BOT_TOKEN=" >> /etc/openclaw/env
   chmod 600 /etc/openclaw/env
 fi
 
-# ── 7. Install systemd units ────────────────────────────────────────
+# ── 8. Install systemd units ────────────────────────────────────────
 echo ">>> Installing systemd units..."
 
 # Gateway service
@@ -193,8 +204,30 @@ RandomizedDelaySec=1800
 WantedBy=timers.target
 EOF
 
-# ── 8. Enable timers ────────────────────────────────────────────────
+# Cloud SQL Auth Proxy (provides local 127.0.0.1:5432 → Cloud SQL)
+cat > /etc/systemd/system/cloud-sql-proxy.service <<EOF
+[Unit]
+Description=Cloud SQL Auth Proxy (${TENANT_ID})
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/cloud-sql-proxy \
+  --auto-iam-authn \
+  --private-ip \
+  sugato-489514:us-central1:oc-shared-db
+Restart=always
+RestartSec=5
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# ── 9. Enable timers and services ──────────────────────────────────
 systemctl daemon-reload
+systemctl enable --now cloud-sql-proxy
 systemctl enable pesuclaw-sync.timer
 systemctl start pesuclaw-sync.timer
 systemctl enable pesuclaw-update.timer
@@ -202,12 +235,20 @@ systemctl start pesuclaw-update.timer
 systemctl enable openclaw-backup.timer
 systemctl start openclaw-backup.timer
 
-# ── 9. Run initial sync ─────────────────────────────────────────────
+# ── 10. Install mem0 plugin ─────────────────────────────────────────
+echo ">>> Installing mem0 memory plugin..."
+su - "$OPENCLAW_USER" -c "openclaw plugins install @mem0/openclaw-mem0" 2>/dev/null || {
+  log_path=$(which openclaw 2>/dev/null || echo "/usr/local/bin/openclaw")
+  echo "  Warning: mem0 plugin install failed (openclaw may not be installed yet)"
+  echo "  sync.sh will retry on first run"
+}
+
+# ── 11. Run initial sync ────────────────────────────────────────────
 echo ""
 echo ">>> Running initial sync..."
 "$SCRIPT_DIR/sync.sh" --tenant "$TENANT_ID" --verbose
 
-# ── 10. Done ─────────────────────────────────────────────────────────
+# ── 12. Done ─────────────────────────────────────────────────────────
 echo ""
 echo "═══════════════════════════════════════════════════"
 echo "  Installation complete!"

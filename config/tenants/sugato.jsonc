@@ -17,5 +17,24 @@
 
   "channels": {
     "defaults": {}
+  },
+
+  // Mem0: per-tenant memory isolation
+  "plugins": {
+    "entries": {
+      "openclaw-mem0": {
+        "config": {
+          "userId": "sugato",
+          "oss": {
+            "vectorStore": {
+              "config": {
+                "collection_name": "mem0_sugato",
+                "user": "sa-sugato@sugato-489514.iam"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

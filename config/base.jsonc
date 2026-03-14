@@ -49,5 +49,51 @@
         "source": "env"
       }
     }
+  },
+
+  // Mem0 long-term memory plugin (embedded, pgvector-backed)
+  // Per-tenant overrides set collection_name and userId in tenant configs.
+  "plugins": {
+    "enabled": true,
+    "entries": {
+      "openclaw-mem0": {
+        "enabled": true,
+        "config": {
+          "mode": "open-source",
+          "autoRecall": true,
+          "autoCapture": true,
+          "topK": 5,
+          "searchThreshold": 0.5,
+          "oss": {
+            "embedder": {
+              "provider": "openai",
+              "config": {
+                "model": "text-embedding-3-small",
+                "apiKey": "${OPENAI_API_KEY}"
+              }
+            },
+            "vectorStore": {
+              "provider": "pgvector",
+              "config": {
+                "host": "127.0.0.1",
+                "port": 5432,
+                "dbname": "mem0",
+                "user": "",
+                "password": "",
+                "collection_name": "",
+                "embedding_model_dims": 1536
+              }
+            },
+            "llm": {
+              "provider": "openai",
+              "config": {
+                "model": "gpt-4.1-nano",
+                "apiKey": "${OPENAI_API_KEY}"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
