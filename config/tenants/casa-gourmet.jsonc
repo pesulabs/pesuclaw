@@ -11,15 +11,36 @@
       }
     }
   },
-  "telegram": {
-    "enabled": true,
-    "dmPolicy": "allowlist",
-    "botToken": "8703144796:AAHWOPoiMkaBAlcn57fUr9LMsS4tT5VFY2I",
-    "allowFrom": [
-      6041283426
-    ],
-    "groupPolicy": "deny",
-    "groupAllowFrom": [],
-    "streaming": "partial"
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "allowlist",
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "allowFrom": [
+        6041283426
+      ],
+      "groupPolicy": "disabled",
+      "groupAllowFrom": [],
+      "streaming": "partial"
+    }
+  },
+
+  // Mem0: per-tenant memory isolation
+  "plugins": {
+    "entries": {
+      "openclaw-mem0": {
+        "config": {
+          "userId": "casa-gourmet",
+          "oss": {
+            "vectorStore": {
+              "config": {
+                "collection_name": "mem0_casa_gourmet",
+                "user": "sa-casa-gourmet@sugato-489514.iam"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

@@ -6,5 +6,24 @@
   "commands": {
     "config": true,
     "bash": true
+  },
+
+  // Mem0: per-tenant memory isolation
+  "plugins": {
+    "entries": {
+      "openclaw-mem0": {
+        "config": {
+          "userId": "orchestrator",
+          "oss": {
+            "vectorStore": {
+              "config": {
+                "collection_name": "mem0_orchestrator",
+                "user": "sa-orchestrator@sugato-489514.iam"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

@@ -166,7 +166,22 @@ if [[ -n "$DESIRED_NPM" ]]; then
   done <<< "$DESIRED_NPM"
 fi
 
-# ── 6. Reconcile skills ──────────────────────────────────────────────
+# ── 6. Reconcile mem0 plugin ──────────────────────────────────────────
+vlog "  Ensuring mem0 plugin is installed..."
+if command -v openclaw &>/dev/null; then
+  if ! su - "$OPENCLAW_USER" -c "openclaw plugins list 2>/dev/null" | grep -q "openclaw-mem0"; then
+    log "  Installing mem0 plugin..."
+    if [[ "$DRY_RUN" == "false" ]]; then
+      su - "$OPENCLAW_USER" -c "openclaw plugins install @mem0/openclaw-mem0" 2>/dev/null || \
+        log "  Warning: mem0 plugin install failed"
+      changed=1
+    fi
+  else
+    vlog "  mem0 plugin already installed"
+  fi
+fi
+
+# ── 7. Reconcile skills ──────────────────────────────────────────────
 log "  Syncing skills..."
 DESIRED_SKILLS=$(read_yaml "$MANIFEST" "skills")
 SKILLS_DIR="$OPENCLAW_HOME/skills"
@@ -209,7 +224,7 @@ for existing_skill in "$SKILLS_DIR"/*/; do
   fi
 done
 
-# ── 7. Reconcile custom tools ────────────────────────────────────────
+# ── 8. Reconcile custom tools ────────────────────────────────────────
 DESIRED_TOOLS=$(read_yaml "$MANIFEST" "tools")
 mkdir -p "$BIN_DIR"
 if [[ -n "$DESIRED_TOOLS" ]]; then
@@ -233,7 +248,7 @@ if [[ -n "$DESIRED_TOOLS" ]]; then
   done <<< "$DESIRED_TOOLS"
 fi
 
-# ── 8. Reconcile config ($include approach) ──────────────────────────
+# ── 9. Reconcile config ($include approach) ──────────────────────────
 # Config files from the repo are deployed as $include layers.
 # OpenClaw's openclaw.json references them via $include and is NEVER overwritten
 # after first boot — runtime changes (channels, models, agents) are preserved.
@@ -351,8 +366,9 @@ else
     NEED_REPAIR=true
     log "  Detected deprecated key in openclaw.json (configWrites)"
   fi
-  if grep -Eq "\"\\$include\"[[:space:]]*:[[:space:]]*\"\./config/\"" "$OC_CONFIG" 2>/dev/null || \
-     grep -Eq "\"\./config/\"" "$OC_CONFIG" 2>/dev/null; then
+  # shellcheck disable=SC2016
+  if grep -Eq '"\$include"[[:space:]]*:[[:space:]]*"\./config/"' "$OC_CONFIG" 2>/dev/null || \
+     grep -Eq '"\./config/"' "$OC_CONFIG" 2>/dev/null; then
     NEED_REPAIR=true
     log "  Detected invalid include target in openclaw.json (./config/)"
   fi
@@ -367,7 +383,7 @@ else
   fi
 fi
 
-# ── 9. Reconcile workspace templates (only on first deploy) ──────────
+# ── 10. Reconcile workspace templates (only on first deploy) ─────────
 if [[ -n "$WORKSPACE_TEMPLATE" ]]; then
   TEMPLATE_DIR="$SCRIPT_DIR/workspace-templates/$WORKSPACE_TEMPLATE"
   if [[ ! -d "$TEMPLATE_DIR" ]]; then
@@ -386,12 +402,12 @@ if [[ -n "$WORKSPACE_TEMPLATE" ]]; then
   done
 fi
 
-# ── 10. Fix ownership ────────────────────────────────────────────────
+# ── 11. Fix ownership ────────────────────────────────────────────────
 if [[ "$DRY_RUN" == "false" ]]; then
   chown -R "$OPENCLAW_USER:$OPENCLAW_USER" "$OPENCLAW_HOME"
 fi
 
-# ── 11. Restart if needed ────────────────────────────────────────────
+# ── 12. Restart if needed ────────────────────────────────────────────
 if [[ $changed -gt 0 ]]; then
   log "Changes detected — restarting OpenClaw gateway..."
   if [[ "$DRY_RUN" == "false" ]]; then
