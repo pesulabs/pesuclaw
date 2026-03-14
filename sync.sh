@@ -174,6 +174,36 @@ if command -v openclaw &>/dev/null; then
     if [[ "$DRY_RUN" == "false" ]]; then
       su - "$OPENCLAW_USER" -c "openclaw plugins install @mem0/openclaw-mem0" 2>/dev/null || \
         log "  Warning: mem0 plugin install failed"
+      # Fix known packaging issues in @mem0/openclaw-mem0
+      MEM0_DIR="$OPENCLAW_HOME/extensions/openclaw-mem0"
+      if [[ -d "$MEM0_DIR" ]]; then
+        # Fix entry point: ./index.ts -> ./dist/index.js (source not included in npm package)
+        sed -i 's|"./index.ts"|"./dist/index.js"|' "$MEM0_DIR/package.json" 2>/dev/null
+        # Create plugin manifest if missing
+        if [[ ! -f "$MEM0_DIR/openclaw.plugin.json" ]]; then
+          cat > "$MEM0_DIR/openclaw.plugin.json" <<'PLUGINJSON'
+{
+  "id": "openclaw-mem0",
+  "name": "Memory (Mem0)",
+  "kind": "memory",
+  "description": "Mem0 memory backend — Mem0 platform or self-hosted open-source",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "mode": { "type": "string", "enum": ["open-source", "platform"] },
+      "autoRecall": { "type": "boolean" },
+      "autoCapture": { "type": "boolean" },
+      "topK": { "type": "number" },
+      "searchThreshold": { "type": "number" },
+      "oss": { "type": "object", "additionalProperties": true }
+    }
+  }
+}
+PLUGINJSON
+          chown "$OPENCLAW_USER:$OPENCLAW_USER" "$MEM0_DIR/openclaw.plugin.json"
+        fi
+      fi
       changed=1
     fi
   else
