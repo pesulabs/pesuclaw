@@ -112,7 +112,7 @@ Environment=OPENCLAW_HOME=/home/openclaw
 Environment=TENANT_ID=${TENANT_ID}
 Environment=PATH=/opt/pesuclaw/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile=-/etc/openclaw/env
-ExecStart=$(which openclaw 2>/dev/null || echo "/usr/local/bin/openclaw") gateway
+ExecStart=/usr/bin/openclaw gateway
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -228,6 +228,7 @@ EOF
 # ── 9. Enable timers and services ──────────────────────────────────
 systemctl daemon-reload
 systemctl enable --now cloud-sql-proxy
+systemctl enable openclaw.service
 systemctl enable pesuclaw-sync.timer
 systemctl start pesuclaw-sync.timer
 systemctl enable pesuclaw-update.timer
