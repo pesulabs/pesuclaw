@@ -119,7 +119,7 @@ StandardOutput=journal
 StandardError=journal
 NoNewPrivileges=yes
 ProtectSystem=strict
-ReadWritePaths=${OPENCLAW_HOME} /tmp
+ReadWritePaths=/home/openclaw /tmp
 PrivateTmp=yes
 
 [Install]
