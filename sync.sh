@@ -88,7 +88,8 @@ log "Reconciling tenant: $TENANT_ID"
 log "  Desired OpenClaw: $DESIRED_VERSION"
 
 # ── 2. Reconcile OpenClaw version ─────────────────────────────────────
-CURRENT_VERSION=$(openclaw --version 2>/dev/null || echo "not-installed")
+# Extract semver only: "OpenClaw 2026.3.13 (61d171a)" -> "2026.3.13"
+CURRENT_VERSION=$(openclaw --version 2>/dev/null | awk '{print $2}' || echo "not-installed")
 
 if [[ "$DESIRED_VERSION" == "latest" ]]; then
   # Check if an update is available
