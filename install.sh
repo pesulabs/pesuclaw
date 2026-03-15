@@ -50,7 +50,17 @@ echo ">>> Installing base dependencies..."
 apt-get update -qq
 apt-get install -y -qq curl git jq
 
-# ── 2. Tailscale VPN ──────────────────────────────────────────────
+# ── 2. Docker (required for OpenClaw sandbox) ─────────────────────
+if ! command -v docker &>/dev/null; then
+  echo ">>> Installing Docker..."
+  curl -fsSL https://get.docker.com | sh
+  usermod -aG docker "$OPENCLAW_USER"
+  systemctl enable --now docker
+else
+  echo ">>> Docker $(docker --version | cut -d' ' -f3 | tr -d ',') already installed"
+fi
+
+# ── 3. Tailscale VPN ──────────────────────────────────────────────
 if ! command -v tailscale &>/dev/null; then
   echo ">>> Installing Tailscale..."
   curl -fsSL https://tailscale.com/install.sh | sh
