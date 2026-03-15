@@ -5,7 +5,7 @@
 tenant_id: casa-gourmet
 instance_type: client
 
-openclaw_version: '2026.3.8'
+openclaw_version: latest
 
 workspace_template: casa-gourmet
 
