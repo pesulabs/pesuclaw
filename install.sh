@@ -95,10 +95,12 @@ echo "$TENANT_ID" > /etc/openclaw/tenant-id
 
 # ── 7. Create secrets env file ──────────────────────────────────────
 if [[ ! -f /etc/openclaw/env ]]; then
-  echo "# Secrets — populate from GCP Secret Manager" > /etc/openclaw/env
-  echo "# GEMINI_API_KEY=" >> /etc/openclaw/env
-  echo "# OPENAI_API_KEY=" >> /etc/openclaw/env
-  echo "# TELEGRAM_BOT_TOKEN=" >> /etc/openclaw/env
+  {
+    echo "# Secrets — populate from GCP Secret Manager"
+    echo "# GEMINI_API_KEY="
+    echo "# OPENAI_API_KEY="
+    echo "# TELEGRAM_BOT_TOKEN="
+  } > /etc/openclaw/env
   chmod 600 /etc/openclaw/env
 fi
 
@@ -267,7 +269,6 @@ fi
 # ── 11. Install mem0 plugin ─────────────────────────────────────────
 echo ">>> Installing mem0 memory plugin..."
 su - "$OPENCLAW_USER" -c "openclaw plugins install @mem0/openclaw-mem0" 2>/dev/null || {
-  log_path=$(which openclaw 2>/dev/null || echo "/usr/local/bin/openclaw")
   echo "  Warning: mem0 plugin install failed (openclaw may not be installed yet)"
   echo "  sync.sh will retry on first run"
 }
