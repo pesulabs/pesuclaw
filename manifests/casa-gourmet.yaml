@@ -23,6 +23,16 @@ skills:
   # Client-specific:
   # - whatsapp-sales
 
+# Secrets from GCP Secret Manager → /etc/openclaw/env
+# Format: secret-name: ENV_VAR_NAME
+secrets:
+  casa-gourmet-gemini-api-key: GEMINI_API_KEY
+  casa-gourmet-openai-api-key: OPENAI_API_KEY
+  casa-gourmet-telegram-bot-token: TELEGRAM_BOT_TOKEN
+  casa-gourmet-db-password: DB_PASSWORD
+  casa-gourmet-lucia-telegram-bot-token: LUCIA_TELEGRAM_BOT_TOKEN
+  casa-gourmet-lucia-openai-api-key: LUCIA_OPENAI_API_KEY
+
 packages:
   - jq
   - curl

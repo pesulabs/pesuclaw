@@ -24,6 +24,13 @@ skills:
   - memory-forget
   - memory-reflect
 
+# Secrets from GCP Secret Manager → /etc/openclaw/env
+secrets:
+  sugato-gemini-api-key: GEMINI_API_KEY
+  sugato-openai-api-key: OPENAI_API_KEY
+  sugato-telegram-bot-token: TELEGRAM_BOT_TOKEN
+  sugato-db-password: DB_PASSWORD
+
 # System packages (apt) — only installed if missing
 packages:
   - jq
