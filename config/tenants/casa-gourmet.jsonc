@@ -20,7 +20,7 @@
         "workspace": "/home/openclaw/.openclaw/workspace/agents/lucia",
         "agentDir": "/home/openclaw/.openclaw/agents/lucia/agent",
         "model": {
-          "primary": "google/gemini-2.5-flash"
+          "primary": "openai/gpt-5-nano"
         },
         "tools": {
           "profile": "messaging",
