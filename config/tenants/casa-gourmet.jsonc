@@ -9,7 +9,34 @@
           "network": "bridge"
         }
       }
-    }
+    },
+    "list": [
+      {
+        "id": "main"
+      },
+      {
+        "id": "lucia",
+        "name": "Lucia",
+        "workspace": "/home/openclaw/.openclaw/workspace/agents/lucia",
+        "agentDir": "/home/openclaw/.openclaw/agents/lucia/agent",
+        "model": {
+          "primary": "google/gemini-2.5-flash"
+        },
+        "tools": {
+          "profile": "messaging",
+          "deny": ["gateway", "cron", "group:nodes", "bash", "browser"]
+        },
+        "subagents": {
+          "allowAgents": []
+        },
+        "routing": [
+          {
+            "channel": "telegram",
+            "account": "lucia"
+          }
+        ]
+      }
+    ]
   },
   "channels": {
     "telegram": {
@@ -21,7 +48,18 @@
       ],
       "groupPolicy": "disabled",
       "groupAllowFrom": [],
-      "streaming": "partial"
+      "streaming": "partial",
+      // Lucia's separate Telegram bot
+      "accounts": {
+        "lucia": {
+          "botToken": "${LUCIA_TELEGRAM_BOT_TOKEN}",
+          "enabled": true,
+          "dmPolicy": "allowlist",
+          "allowFrom": [6041283426],
+          "groupPolicy": "disabled",
+          "streaming": "partial"
+        }
+      }
     }
   },
 
