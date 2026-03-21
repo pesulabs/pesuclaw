@@ -16,7 +16,13 @@
   },
 
   "channels": {
-    "defaults": {}
+    "defaults": {},
+    // WhatsApp: dedicated number, pairing-based DM access
+    "whatsapp": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist"
+    }
   },
 
   // Mem0: per-tenant memory isolation
