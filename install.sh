@@ -50,7 +50,25 @@ echo ">>> Installing base dependencies..."
 apt-get update -qq
 apt-get install -y -qq curl git jq
 
-# ── 2. Cloud SQL Auth Proxy ─────────────────────────────────────────
+# ── 2. Docker (required for OpenClaw sandbox) ─────────────────────
+if ! command -v docker &>/dev/null; then
+  echo ">>> Installing Docker..."
+  curl -fsSL https://get.docker.com | sh
+  usermod -aG docker "$OPENCLAW_USER"
+  systemctl enable --now docker
+else
+  echo ">>> Docker $(docker --version | cut -d' ' -f3 | tr -d ',') already installed"
+fi
+
+# ── 3. Tailscale VPN ──────────────────────────────────────────────
+if ! command -v tailscale &>/dev/null; then
+  echo ">>> Installing Tailscale..."
+  curl -fsSL https://tailscale.com/install.sh | sh
+else
+  echo ">>> Tailscale $(tailscale version | head -1) already installed"
+fi
+
+# ── 3. Cloud SQL Auth Proxy ─────────────────────────────────────────
 if ! command -v cloud-sql-proxy &>/dev/null; then
   echo ">>> Installing Cloud SQL Auth Proxy..."
   curl -sSfL -o /usr/local/bin/cloud-sql-proxy \
@@ -87,10 +105,12 @@ echo "$TENANT_ID" > /etc/openclaw/tenant-id
 
 # ── 7. Create secrets env file ──────────────────────────────────────
 if [[ ! -f /etc/openclaw/env ]]; then
-  echo "# Secrets — populate from GCP Secret Manager" > /etc/openclaw/env
-  echo "# GEMINI_API_KEY=" >> /etc/openclaw/env
-  echo "# OPENAI_API_KEY=" >> /etc/openclaw/env
-  echo "# TELEGRAM_BOT_TOKEN=" >> /etc/openclaw/env
+  {
+    echo "# Secrets — populate from GCP Secret Manager"
+    echo "# GEMINI_API_KEY="
+    echo "# OPENAI_API_KEY="
+    echo "# TELEGRAM_BOT_TOKEN="
+  } > /etc/openclaw/env
   chmod 600 /etc/openclaw/env
 fi
 
@@ -236,10 +256,29 @@ systemctl start pesuclaw-update.timer
 systemctl enable openclaw-backup.timer
 systemctl start openclaw-backup.timer
 
-# ── 10. Install mem0 plugin ─────────────────────────────────────────
+# ── 10. Join Tailscale network ─────────────────────────────────────
+echo ">>> Joining Tailscale network..."
+if tailscale status &>/dev/null 2>&1; then
+  echo "  Already connected to Tailnet"
+else
+  TS_AUTHKEY=$(gcloud secrets versions access latest \
+    --secret="${TENANT_ID}-tailscale-authkey" \
+    --project=sugato-489514 2>/dev/null || true)
+  if [[ -n "$TS_AUTHKEY" ]]; then
+    tailscale up --authkey="$TS_AUTHKEY" --hostname="vm-${TENANT_ID}" --accept-routes
+    echo "  Joined Tailnet as vm-${TENANT_ID}"
+    # Expose OpenClaw gateway over HTTPS via Tailscale Serve
+    tailscale serve --bg http://localhost:8080
+    echo "  HTTPS dashboard: https://vm-${TENANT_ID}.chimp-ulmer.ts.net/"
+  else
+    echo "  Warning: No Tailscale auth key found in Secret Manager"
+    echo "  Create secret '${TENANT_ID}-tailscale-authkey' and run: tailscale up --authkey=<key> --hostname=vm-${TENANT_ID}"
+  fi
+fi
+
+# ── 11. Install mem0 plugin ─────────────────────────────────────────
 echo ">>> Installing mem0 memory plugin..."
 su - "$OPENCLAW_USER" -c "openclaw plugins install @mem0/openclaw-mem0" 2>/dev/null || {
-  log_path=$(which openclaw 2>/dev/null || echo "/usr/local/bin/openclaw")
   echo "  Warning: mem0 plugin install failed (openclaw may not be installed yet)"
   echo "  sync.sh will retry on first run"
 }

@@ -88,7 +88,8 @@ log "Reconciling tenant: $TENANT_ID"
 log "  Desired OpenClaw: $DESIRED_VERSION"
 
 # ── 2. Reconcile OpenClaw version ─────────────────────────────────────
-CURRENT_VERSION=$(openclaw --version 2>/dev/null || echo "not-installed")
+# Extract semver only: "OpenClaw 2026.3.13 (61d171a)" -> "2026.3.13"
+CURRENT_VERSION=$(openclaw --version 2>/dev/null | awk '{print $2}' || echo "not-installed")
 
 if [[ "$DESIRED_VERSION" == "latest" ]]; then
   # Check if an update is available
@@ -382,6 +383,30 @@ $include_lines
 }
 SEED
 }
+
+# ── Reconcile secrets from GCP Secret Manager ─────────────────────────
+# Reads secrets: map from manifest (secret-name: ENV_VAR) and ensures
+# each is present in /etc/openclaw/env. Only fetches missing ones.
+SECRETS_BLOCK=$(awk '/^secrets:/{found=1; next} found && /^[^ ]/{exit} found && /^ /{print}' "$MANIFEST")
+if [[ -n "$SECRETS_BLOCK" ]]; then
+  while IFS=': ' read -r secret_name env_var; do
+    # Skip empty lines and comments
+    [[ -z "$secret_name" || "$secret_name" == \#* ]] && continue
+    # Trim leading spaces from YAML indent
+    secret_name=$(echo "$secret_name" | xargs)
+    env_var=$(echo "$env_var" | xargs)
+    if ! grep -q "^${env_var}=" /etc/openclaw/env 2>/dev/null; then
+      SECRET_VAL=$(gcloud secrets versions access latest --secret="$secret_name" --project=sugato-489514 2>/dev/null || true)
+      if [[ -n "$SECRET_VAL" ]]; then
+        echo "${env_var}=${SECRET_VAL}" >> /etc/openclaw/env
+        log "  Provisioned secret: $env_var"
+        changed=1
+      else
+        log "  Warning: secret '$secret_name' not found in Secret Manager"
+      fi
+    fi
+  done <<< "$SECRETS_BLOCK"
+fi
 
 # Generate a local gateway token if not present
 if ! grep -q "^OPENCLAW_GATEWAY_TOKEN=" /etc/openclaw/env; then

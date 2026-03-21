@@ -39,6 +39,21 @@
   "cron": {
     "enabled": true
   },
+  // Gateway — accessible via Tailscale for admin dashboard access.
+  // Tailnet origins use wildcard to cover all 100.x.y.z Tailscale IPs.
+  // New tenants inherit this automatically.
+  "gateway": {
+    "port": 8080,
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowedOrigins": ["*"]
+    },
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+    }
+  },
   "logging": {
     "level": "info",
     "redactSensitive": "tools"
