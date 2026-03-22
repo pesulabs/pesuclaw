@@ -1,0 +1,28 @@
+{
+  "name": "sugaclaw",
+  "displayName": "Sugaclaw — General Manager, Sugato",
+  "version": "0.1.0",
+  "specVersion": "0.4",
+  "description": "GM de Sugato. Ops, marketing, CRM y proyectos. Bilingüe, casual, 3-tier governance.",
+  "author": {
+    "name": "pesuclaw",
+    "github": "pesuclaw"
+  },
+  "license": "private",
+  "tags": [
+    "gm",
+    "operations",
+    "crm",
+    "marketing",
+    "bilingual",
+    "whatsapp"
+  ],
+  "category": "team-ops",
+  "files": {
+    "soul": "SOUL.md",
+    "identity": "IDENTITY.md",
+    "agents": "AGENTS.md",
+    "user": "USER.md",
+    "heartbeat": "HEARTBEAT.md"
+  }
+}
