@@ -454,11 +454,16 @@ if [[ -n "$WORKSPACE_TEMPLATE" ]]; then
   WORKSPACE="$OPENCLAW_HOME/workspace"
   mkdir -p "$WORKSPACE"
 
-  for f in AGENTS.md SOUL.md IDENTITY.md USER.md TOOLS.md; do
-    if [[ -f "$TEMPLATE_DIR/$f" && ! -f "$WORKSPACE/$f" ]]; then
-      log "  Bootstrapping: $f"
-      if [[ "$DRY_RUN" == "false" ]]; then
-        cp "$TEMPLATE_DIR/$f" "$WORKSPACE/$f"
+  for f in AGENTS.md SOUL.md IDENTITY.md USER.md TOOLS.md HEARTBEAT.md; do
+    if [[ -f "$TEMPLATE_DIR/$f" ]]; then
+      if [[ ! -f "$WORKSPACE/$f" ]] || ! cmp -s "$TEMPLATE_DIR/$f" "$WORKSPACE/$f"; then
+        log "  Updating workspace: $f"
+        if [[ "$DRY_RUN" == "false" ]]; then
+          cp "$TEMPLATE_DIR/$f" "$WORKSPACE/$f"
+          changed=1
+        fi
+      else
+        vlog "  Workspace '$f' is current"
       fi
     fi
   done
