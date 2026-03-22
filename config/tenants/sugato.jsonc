@@ -35,8 +35,12 @@
   },
 
   // Mem0: per-tenant memory isolation
+  // ACP: sub-agent spawning (sessions_spawn / sessions_send)
   "plugins": {
     "entries": {
+      "acpx": {
+        "enabled": true
+      },
       "openclaw-mem0": {
         "config": {
           "userId": "sugato",
