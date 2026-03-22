@@ -25,6 +25,15 @@
     }
   },
 
+  // Primary model override
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/gpt-5.4"
+      }
+    }
+  },
+
   // Mem0: per-tenant memory isolation
   "plugins": {
     "entries": {
