@@ -41,18 +41,12 @@
       "acpx": {
         "enabled": true
       },
+<<<<<<< staging
+      // mem0 disabled: vectorStore provider config incomplete — fix in issue #16
+=======
+>>>>>>> master
       "openclaw-mem0": {
-        "config": {
-          "userId": "sugato",
-          "oss": {
-            "vectorStore": {
-              "config": {
-                "collection_name": "mem0_sugato",
-                "user": "sa-sugato@sugato-489514.iam"
-              }
-            }
-          }
-        }
+        "enabled": false
       }
     }
   }
