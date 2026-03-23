@@ -45,4 +45,5 @@ tools: []
 pip: []
 
 # Node packages (global) — only if needed by custom tools
-npm_global: []
+npm_global:
+  - acpx
