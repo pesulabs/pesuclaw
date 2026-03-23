@@ -41,7 +41,10 @@
       "acpx": {
         "enabled": true
       },
+<<<<<<< staging
       // mem0 disabled: vectorStore provider config incomplete — fix in issue #16
+=======
+>>>>>>> master
       "openclaw-mem0": {
         "enabled": false
       }
