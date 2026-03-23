@@ -355,7 +355,6 @@ $include_lines
 
   "agents": {
     "defaults": {
-      "model": { "primary": "google/gemini-2.5-flash" },
       "userTimezone": "America/Argentina/Buenos_Aires",
       "maxConcurrent": 2,
       "heartbeat": {
