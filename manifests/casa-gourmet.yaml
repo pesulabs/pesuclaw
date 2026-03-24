@@ -32,14 +32,27 @@ secrets:
   casa-gourmet-db-password: DB_PASSWORD
   casa-gourmet-lucia-telegram-bot-token: LUCIA_TELEGRAM_BOT_TOKEN
   casa-gourmet-lucia-openai-api-key: LUCIA_OPENAI_API_KEY
+  casa-gourmet-n8n-db-url: N8N_DB_URL
+  casa-gourmet-n8n-encryption-key: N8N_ENCRYPTION_KEY
 
 packages:
   - jq
   - curl
   - git
+  - docker.io
+  - docker-compose
 
 tools: []
 
 pip: []
 
 npm_global: []
+
+# N8n workflow automation platform
+# Deployed via docker-compose at ~/pesuclaw/clients/casa-gourmet/n8n/
+# Access at https://n8n.casa-gourmet.sugato.agency
+services:
+  n8n:
+    enabled: true
+    docker_compose_path: clients/casa-gourmet/n8n/docker-compose.yml
+    env_file: .env.n8n
