@@ -31,10 +31,10 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - N8N_HOST=n8n.casa-gourmet.sugato.agency
+      - N8N_HOST=n8n-casa-gourmet.sugato.agency
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://n8n.casa-gourmet.sugato.agency
+      - WEBHOOK_URL=https://n8n-casa-gourmet.sugato.agency
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_DATABASE=n8n_casa_gourmet
