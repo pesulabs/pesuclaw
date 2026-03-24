@@ -1,0 +1,56 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - n8n
+    networks:
+      - n8n
+
+  cloud-sql-proxy:
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2
+    restart: unless-stopped
+    network_mode: host
+    command:
+      - "${CLOUD_SQL_CONNECTION_NAME}"
+      - "--address=0.0.0.0"
+      - "--port=5433"
+      - "--private-ip"
+      - "--health-check"
+      - "--http-port=9090"
+
+  n8n:
+    image: n8nio/n8n:2.12.3
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - N8N_HOST=n8n-casa-gourmet.sugato.agency
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n-casa-gourmet.sugato.agency
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n_casa_gourmet
+      - DB_POSTGRESDB_HOST=host.docker.internal
+      - DB_POSTGRESDB_PORT=5433
+      - DB_POSTGRESDB_USER=${PG_USER}
+      - DB_POSTGRESDB_PASSWORD=${PG_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - n8n
+
+volumes:
+  n8n_data:
+
+networks:
+  n8n:
